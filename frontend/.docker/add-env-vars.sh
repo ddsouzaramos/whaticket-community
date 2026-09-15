@@ -5,7 +5,11 @@ _writeFrontendEnvVars() {
 }
 
 _writeNginxEnvVars() {
-    dockerize -template /etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf
+    envsubst '${URL_BACKEND} ${FRONTEND_SERVER_NAME} ${BACKEND_SERVER_NAME}' \
+        < /etc/nginx/conf.d/default.conf \
+        > /tmp/default.conf
+
+    mv /tmp/default.conf /etc/nginx/conf.d/default.conf
 }
 
 _addSslConfig() {
