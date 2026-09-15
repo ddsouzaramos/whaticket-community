@@ -35,6 +35,9 @@ services:
 
     restart: unless-stopped
 
+    labels:
+      - "traefik.docker.network=gtjooax29366jg68hz48yu7r"
+
     networks:
       - whaticket
 
