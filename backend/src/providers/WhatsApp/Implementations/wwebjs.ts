@@ -355,7 +355,8 @@ const sendMessage = async (
 
   const sentMessage = await wbot.sendMessage(to, body, {
     quotedMessageId: quotedMsgSerializedId,
-    linkPreview: options?.linkPreview
+    linkPreview: options?.linkPreview,
+    waitUntilMsgSent: true
   });
 
 logger.info(
