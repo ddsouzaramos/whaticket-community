@@ -1,3 +1,4 @@
+import { logger } from "../../utils/logger";
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
@@ -37,6 +38,7 @@ const SendWhatsAppMessage = async ({
     await ticket.update({ lastMessage: body });
     return sentMessage;
   } catch (err) {
+    logger.error(err, "DEBUG real error sending WhatsApp message");
     throw new AppError("ERR_SENDING_WAPP_MSG");
   }
 };
