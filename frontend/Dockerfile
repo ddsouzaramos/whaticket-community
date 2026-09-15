@@ -16,7 +16,7 @@ RUN npm run build
 
 FROM nginx:alpine
 
-RUN apk add --no-cache jq openssl
+RUN apk add --no-cache jq openssl gettext
 
 ENV PUBLIC_HTML=/var/www/public/
 
