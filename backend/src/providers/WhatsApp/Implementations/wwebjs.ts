@@ -251,24 +251,28 @@ const getMessageData = async (
     "DEBUG incoming WhatsApp message"
   );
   
-  const chat =
-  !msg.fromMe && msg.from.endsWith("@lid")
-    ? await wbot.getChatById(msgContact.id._serialized)
-    : await msg.getChat();
+  let unreadMessages = 0;
 
-  if (chat.isGroup) {
-    let msgGroupContact;
+  if (!msg.fromMe && msg.from.endsWith("@lid")) {
+    // Mensagem individual usando o novo identificador LID.
+    // Evita getChat()/getChatById(), que atualmente falham com LID.
+    unreadMessages = 1;
+  } else {
+    const chat = await msg.getChat();
 
-    if (msg.fromMe) {
-      msgGroupContact = await wbot.getContactById(msg.to);
-    } else {
-      msgGroupContact = await wbot.getContactById(msg.from);
+    if (chat.isGroup) {
+      let msgGroupContact;
+
+      if (msg.fromMe) {
+        msgGroupContact = await wbot.getContactById(msg.to);
+      } else {
+        msgGroupContact = await wbot.getContactById(msg.from);
+      }
+
+      groupContact = await convertToContactPayload(msgGroupContact);
     }
-
-    groupContact = await convertToContactPayload(msgGroupContact);
+    unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
   }
-
-  const unreadMessages = msg.fromMe ? 0 : chat.unreadCount;
 
   const contactPayload = await convertToContactPayload(msgContact);
   const messagePayload = await convertToMessagePayload(msg);
