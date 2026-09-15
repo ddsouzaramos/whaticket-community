@@ -361,13 +361,8 @@ const sendMessage = async (
 
   const onMessageCreate = (msg: WbotMessage) => {
     if (!msg.fromMe) return;
-
-    const sameDestination =
-      msg.to === to ||
-      msg.id?.remote === to;
-
-    if (!sameDestination) return;
-
+    if (msg.body !== body) return;
+  
     resolveCreatedMessage?.(msg);
   };
 
