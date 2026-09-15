@@ -101,7 +101,20 @@ const getSerializedMessageId = (
 const convertToContactPayload = async (
   msgContact: WbotContact
 ): Promise<ContactPayload> => {
-  const profilePicUrl = await msgContact.getProfilePicUrl();
+  let profilePicUrl;
+
+  try {
+    profilePicUrl = await msgContact.getProfilePicUrl();
+  } catch (err) {
+    logger.warn(
+      {
+        contactId: msgContact.id?._serialized
+      },
+      "Could not get WhatsApp profile picture"
+    );
+
+    profilePicUrl = undefined;
+  }
 
   return {
     name: msgContact.name || msgContact.pushname || msgContact.id.user,
