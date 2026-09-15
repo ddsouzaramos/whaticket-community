@@ -405,32 +405,6 @@ const sendMessage = async (
   }
 };
 
-  const quotedMsgSerializedId = options?.quotedMessageId
-    ? getSerializedMessageId(
-        to,
-        Boolean(options?.quotedMessageFromMe),
-        options?.quotedMessageId
-      )
-    : "";
-
-  const sentMessage = await wbot.sendMessage(to, body, {
-    quotedMessageId: quotedMsgSerializedId,
-    linkPreview: options?.linkPreview,
-    waitUntilMsgSent: true
-  });
-
-logger.info(
-  {
-    sentMessage,
-    to,
-    body
-  },
-  "DEBUG wwebjs sendMessage return"
-);
-  
-  return convertToProviderMessage(sentMessage);
-};
-
 const sendMedia = async (
   sessionId: number,
   to: string,
