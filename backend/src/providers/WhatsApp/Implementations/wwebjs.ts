@@ -241,25 +241,19 @@ const getMessageData = async (
     msgContact = await msg.getContact();
   }
 
-logger.info(
-  {
-    from: msg.from,
-    to: msg.to,
-    fromMe: msg.fromMe,
-    type: msg.type,
-    idRemote: msg.id?.remote
-  },
-  "DEBUG outgoing/incoming message"
-);
-  
-  let unreadMessages = 0;
+let unreadMessages = 0;
 
-  if (!msg.fromMe && msg.from.endsWith("@lid")) {
-    // Mensagem individual usando o novo identificador LID.
-    // Evita getChat()/getChatById(), que atualmente falham com LID.
-    unreadMessages = 1;
-  } else {
-    const chat = await msg.getChat();
+const isLidMessage =
+  msg.from.endsWith("@lid") ||
+  msg.to.endsWith("@lid") ||
+  msg.id?.remote?.endsWith("@lid");
+
+if (isLidMessage) {
+  // WhatsApp passou a utilizar LID também em mensagens individuais.
+  // Evita getChat()/getChatById(), que atualmente falham com LID.
+  unreadMessages = msg.fromMe ? 0 : 1;
+} else {
+  const chat = await msg.getChat();
 
     if (chat.isGroup) {
       let msgGroupContact;
