@@ -226,6 +226,18 @@ const getMessageData = async (
     msgContact = await wbot.getContactById(msg.to);
   } else {
     msgContact = await msg.getContact();
+
+    logger.info(
+      {
+        contactId: msgContact.id?._serialized,
+        contactUser: msgContact.id?.user,
+        contactNumber: msgContact.number,
+        contactName: msgContact.name,
+        contactPushname: msgContact.pushname
+      },
+      "DEBUG WhatsApp contact"
+    );
+    
   }
 
   logger.info(
