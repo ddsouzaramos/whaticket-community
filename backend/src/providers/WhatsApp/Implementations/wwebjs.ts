@@ -239,31 +239,8 @@ const getMessageData = async (
     msgContact = await wbot.getContactById(msg.to);
   } else {
     msgContact = await msg.getContact();
-
-    logger.info(
-      {
-        contactId: msgContact.id?._serialized,
-        contactUser: msgContact.id?.user,
-        contactNumber: msgContact.number,
-        contactName: msgContact.name,
-        contactPushname: msgContact.pushname
-      },
-      "DEBUG WhatsApp contact"
-    );
-    
   }
 
-  logger.info(
-    {
-      from: msg.from,
-      to: msg.to,
-      fromMe: msg.fromMe,
-      type: msg.type,
-      idRemote: msg.id?.remote
-    },
-    "DEBUG incoming WhatsApp message"
-  );
-  
   let unreadMessages = 0;
 
   if (!msg.fromMe && msg.from.endsWith("@lid")) {
