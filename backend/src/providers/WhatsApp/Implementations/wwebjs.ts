@@ -358,6 +358,15 @@ const sendMessage = async (
     linkPreview: options?.linkPreview
   });
 
+logger.info(
+  {
+    sentMessage,
+    to,
+    body
+  },
+  "DEBUG wwebjs sendMessage return"
+);
+  
   return convertToProviderMessage(sentMessage);
 };
 
