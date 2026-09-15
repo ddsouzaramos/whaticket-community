@@ -353,6 +353,66 @@ const sendMessage = async (
       )
     : "";
 
+  let resolveCreatedMessage: ((msg: WbotMessage) => void) | undefined;
+
+  const createdMessagePromise = new Promise<WbotMessage>(resolve => {
+    resolveCreatedMessage = resolve;
+  });
+
+  const onMessageCreate = (msg: WbotMessage) => {
+    if (!msg.fromMe) return;
+
+    const sameDestination =
+      msg.to === to ||
+      msg.id?.remote === to;
+
+    if (!sameDestination) return;
+
+    resolveCreatedMessage?.(msg);
+  };
+
+  wbot.on("message_create", onMessageCreate);
+
+  try {
+    const sentMessage = await wbot.sendMessage(to, body, {
+      quotedMessageId: quotedMsgSerializedId,
+      linkPreview: options?.linkPreview,
+      waitUntilMsgSent: true
+    });
+
+    if (sentMessage) {
+      return convertToProviderMessage(sentMessage);
+    }
+
+    logger.warn(
+      { sessionId, to },
+      "sendMessage returned undefined; waiting for message_create"
+    );
+
+    const createdMessage = await Promise.race([
+      createdMessagePromise,
+      new Promise<never>((_, reject) =>
+        setTimeout(
+          () => reject(new Error("Timeout waiting for message_create")),
+          10000
+        )
+      )
+    ]);
+
+    return convertToProviderMessage(createdMessage);
+  } finally {
+    wbot.removeListener("message_create", onMessageCreate);
+  }
+};
+
+  const quotedMsgSerializedId = options?.quotedMessageId
+    ? getSerializedMessageId(
+        to,
+        Boolean(options?.quotedMessageFromMe),
+        options?.quotedMessageId
+      )
+    : "";
+
   const sentMessage = await wbot.sendMessage(to, body, {
     quotedMessageId: quotedMsgSerializedId,
     linkPreview: options?.linkPreview,
