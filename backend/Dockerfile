@@ -35,4 +35,4 @@ EXPOSE 3000
 
 ENTRYPOINT ["dumb-init", "--"]
 
-CMD ["sh", "-c", "npx sequelize db:migrate && node dist/server.js"]
+CMD ["sh", "-c", "find /usr/src/app/.wwebjs_auth -type f,l -name 'Singleton*' -delete 2>/dev/null || true; npx sequelize db:migrate && node dist/server.js"]
