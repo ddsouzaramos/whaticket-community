@@ -251,7 +251,10 @@ const getMessageData = async (
     "DEBUG incoming WhatsApp message"
   );
   
-  const chat = await msg.getChat();
+  const chat =
+  !msg.fromMe && msg.from.endsWith("@lid")
+    ? await wbot.getChatById(msgContact.id._serialized)
+    : await msg.getChat();
 
   if (chat.isGroup) {
     let msgGroupContact;
