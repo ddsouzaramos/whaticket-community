@@ -228,6 +228,17 @@ const getMessageData = async (
     msgContact = await msg.getContact();
   }
 
+  logger.info(
+    {
+      from: msg.from,
+      to: msg.to,
+      fromMe: msg.fromMe,
+      type: msg.type,
+      idRemote: msg.id?.remote
+    },
+    "DEBUG incoming WhatsApp message"
+  );
+  
   const chat = await msg.getChat();
 
   if (chat.isGroup) {
