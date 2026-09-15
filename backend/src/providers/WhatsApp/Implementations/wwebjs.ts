@@ -241,6 +241,17 @@ const getMessageData = async (
     msgContact = await msg.getContact();
   }
 
+logger.info(
+  {
+    from: msg.from,
+    to: msg.to,
+    fromMe: msg.fromMe,
+    type: msg.type,
+    idRemote: msg.id?.remote
+  },
+  "DEBUG outgoing/incoming message"
+);
+  
   let unreadMessages = 0;
 
   if (!msg.fromMe && msg.from.endsWith("@lid")) {
