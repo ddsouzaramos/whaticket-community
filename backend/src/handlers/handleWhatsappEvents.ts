@@ -220,6 +220,11 @@ export const handleMessage = async (
   contextPayload: WhatsappContextPayload,
   mediaPayload?: MediaPayload
 ): Promise<void> => {
+  let currentStage = "contact_resolution";
+  let resolvedTicketId: number | undefined;
+  let resolvedTicketStatus: string | undefined;
+  let resolvedQueueId: number | undefined;
+
   try {
     const processedMessage = processLocationMessage(messagePayload);
 
@@ -251,12 +256,16 @@ export const handleMessage = async (
       return;
     }
 
+    currentStage = "ticket_resolution";
     const ticket = await FindOrCreateTicketService(
       contact,
       contextPayload.whatsappId,
       contextPayload.unreadMessages,
       groupContact
     );
+    resolvedTicketId = ticket.id;
+    resolvedTicketStatus = ticket.status;
+    resolvedQueueId = ticket.queueId;
 
     const messageData: any = {
       id: processedMessage.id,
@@ -289,7 +298,23 @@ export const handleMessage = async (
 
     await ticket.update({ lastMessage: lastMessageText });
 
+    currentStage = "message_persistence";
     await CreateMessageService({ messageData });
+
+    logger.info(
+      {
+        stage: "message_persisted",
+        ticketId: ticket.id,
+        finalStatus: ticket.status,
+        hasQueueId: ticket.queueId !== null && ticket.queueId !== undefined,
+        queueId: ticket.queueId,
+        decision: "persisted",
+        success: true
+      },
+      "Message pipeline checkpoint"
+    );
+
+    currentStage = "post_persistence";
 
     await processVcardMessage(processedMessage);
 
@@ -309,14 +334,21 @@ export const handleMessage = async (
     }
   } catch (err) {
     Sentry.captureException(err);
-    logger.error({
-      info: "Error handling message",
-      err,
-      messagePayload,
-      contactPayload,
-      contextPayload,
-      mediaPayload
-    });
+    logger.error(
+      {
+        stage: currentStage,
+        ticketId: resolvedTicketId,
+        finalStatus: resolvedTicketStatus,
+        hasQueueId:
+          resolvedTicketId === undefined
+            ? undefined
+            : resolvedQueueId !== null && resolvedQueueId !== undefined,
+        queueId: resolvedQueueId,
+        success: false,
+        errorName: err instanceof Error ? err.name : "UnknownError"
+      },
+      "Message pipeline checkpoint failed"
+    );
   }
 };
 

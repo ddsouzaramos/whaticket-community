@@ -2,6 +2,7 @@ import { subHours } from "date-fns";
 import { Op } from "sequelize";
 import Contact from "../../models/Contact";
 import Ticket from "../../models/Ticket";
+import { logger } from "../../utils/logger";
 import ShowTicketService from "./ShowTicketService";
 
 const FindOrCreateTicketService = async (
@@ -20,6 +21,24 @@ const FindOrCreateTicketService = async (
     }
   });
 
+  logger.info(
+    {
+      stage: "active_lookup",
+      found: Boolean(ticket),
+      ticketId: ticket?.id,
+      previousStatus: ticket?.status,
+      hasQueueId: ticket
+        ? ticket.queueId !== null && ticket.queueId !== undefined
+        : undefined,
+      queueId: ticket?.queueId,
+      decision: ticket ? "reused_active" : undefined,
+      success: true
+    },
+    "Ticket resolution checkpoint"
+  );
+
+  let decision = ticket ? "reused_active" : "not_resolved";
+
   if (ticket) {
     await ticket.update({ unreadMessages });
   }
@@ -33,12 +52,46 @@ const FindOrCreateTicketService = async (
       order: [["updatedAt", "DESC"]]
     });
 
+    logger.info(
+      {
+        stage: "group_history_lookup",
+        found: Boolean(ticket),
+        ticketId: ticket?.id,
+        previousStatus: ticket?.status,
+        hasQueueId: ticket
+          ? ticket.queueId !== null && ticket.queueId !== undefined
+          : undefined,
+        queueId: ticket?.queueId,
+        success: true
+      },
+      "Ticket resolution checkpoint"
+    );
+
     if (ticket) {
+      const previousStatus = ticket.status;
+      const preservedQueueId = ticket.queueId;
+
       await ticket.update({
         status: "pending",
         userId: null,
         unreadMessages
       });
+
+      decision = "reopened_group_history";
+      logger.info(
+        {
+          stage: "reopened",
+          ticketId: ticket.id,
+          previousStatus,
+          finalStatus: ticket.status,
+          hasQueueId:
+            preservedQueueId !== null && preservedQueueId !== undefined,
+          queueId: preservedQueueId,
+          decision,
+          success: true
+        },
+        "Ticket resolution checkpoint"
+      );
     }
   }
 
@@ -54,12 +107,46 @@ const FindOrCreateTicketService = async (
       order: [["updatedAt", "DESC"]]
     });
 
+    logger.info(
+      {
+        stage: "recent_history_lookup",
+        found: Boolean(ticket),
+        ticketId: ticket?.id,
+        previousStatus: ticket?.status,
+        hasQueueId: ticket
+          ? ticket.queueId !== null && ticket.queueId !== undefined
+          : undefined,
+        queueId: ticket?.queueId,
+        success: true
+      },
+      "Ticket resolution checkpoint"
+    );
+
     if (ticket) {
+      const previousStatus = ticket.status;
+      const preservedQueueId = ticket.queueId;
+
       await ticket.update({
         status: "pending",
         userId: null,
         unreadMessages
       });
+
+      decision = "reopened_recent_history";
+      logger.info(
+        {
+          stage: "reopened",
+          ticketId: ticket.id,
+          previousStatus,
+          finalStatus: ticket.status,
+          hasQueueId:
+            preservedQueueId !== null && preservedQueueId !== undefined,
+          queueId: preservedQueueId,
+          decision,
+          success: true
+        },
+        "Ticket resolution checkpoint"
+      );
     }
   }
 
@@ -71,9 +158,37 @@ const FindOrCreateTicketService = async (
       unreadMessages,
       whatsappId
     });
+
+    decision = "created_new";
+    logger.info(
+      {
+        stage: "created",
+        ticketId: ticket.id,
+        finalStatus: ticket.status,
+        hasQueueId:
+          ticket.queueId !== null && ticket.queueId !== undefined,
+        queueId: ticket.queueId,
+        decision,
+        success: true
+      },
+      "Ticket resolution checkpoint"
+    );
   }
 
   ticket = await ShowTicketService(ticket.id);
+
+  logger.info(
+    {
+      stage: "ticket_resolved",
+      ticketId: ticket.id,
+      finalStatus: ticket.status,
+      hasQueueId: ticket.queueId !== null && ticket.queueId !== undefined,
+      queueId: ticket.queueId,
+      decision,
+      success: true
+    },
+    "Ticket resolution checkpoint"
+  );
 
   return ticket;
 };
