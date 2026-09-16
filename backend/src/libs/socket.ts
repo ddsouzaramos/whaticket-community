@@ -14,18 +14,27 @@ export const initIO = (httpServer: Server): SocketIO => {
     }
   });
 
-  io.on("connection", socket => {
-    const { token } = socket.handshake.query;
-    let tokenData = null;
-    try {
-      tokenData = verify(token, authConfig.secret);
-      logger.debug(JSON.stringify(tokenData), "io-onConnection: tokenData");
-    } catch (error) {
-      logger.error(JSON.stringify(error), "Error decoding token");
-      socket.disconnect();
-      return io;
-    }
+  io.use((socket, next) => {
+    const token =
+      socket.handshake.auth?.token || socket.handshake.query?.token;
 
+    try {
+      verify(token, authConfig.secret);
+      return next();
+    } catch (error) {
+      const authError = new Error("Socket authentication failed") as Error & {
+        data?: { code: string };
+      };
+      authError.data = { code: "SOCKET_AUTH_ERROR" };
+      logger.warn(
+        { error: error instanceof Error ? error.name : "UnknownError" },
+        "Socket authentication failed"
+      );
+      return next(authError);
+    }
+  });
+
+  io.on("connection", socket => {
     logger.info("Client Connected");
     socket.on("joinChatBox", (ticketId: string) => {
       logger.info("A client joined a ticket channel");
