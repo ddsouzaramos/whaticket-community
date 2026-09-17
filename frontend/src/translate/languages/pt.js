@@ -249,8 +249,8 @@ const messages = {
       },
       transferTicketModal: {
         title: "Transferir Ticket",
-        fieldLabel: "Digite para buscar usuários",
-        fieldQueueLabel: "Transferir para fila",
+        fieldLabel: "Atendente (opcional)",
+        fieldQueueLabel: "Fila de destino",
         fieldConnectionLabel: "Transferir para conexão",
         fieldQueuePlaceholder: "Selecione uma fila",
         fieldConnectionPlaceholder: "Selecione uma conexão",
@@ -466,6 +466,10 @@ const messages = {
           "Erro ao buscar a mensagem no WhtasApp, talvez ela seja muito antiga.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "Esta cor já está em uso, escolha outra.",
+        ERR_TRANSFER_QUEUE_REQUIRED:
+          "Selecione uma fila para transferir o ticket.",
+        ERR_USER_NOT_IN_QUEUE:
+          "O atendente selecionado não pertence à fila de destino.",
         ERR_WAPP_GREETING_REQUIRED:
           "A mensagem de saudação é obrigatório quando há mais de uma fila.",
       },

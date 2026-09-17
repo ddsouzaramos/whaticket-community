@@ -250,8 +250,8 @@ const messages = {
       },
       transferTicketModal: {
         title: "Transferir Ticket",
-        fieldLabel: "Escriba para buscar usuarios",
-        fieldQueueLabel: "Transferir a la cola",
+        fieldLabel: "Agente (opcional)",
+        fieldQueueLabel: "Cola de destino",
         fieldConnectionLabel: "Transferir to conexión",
         fieldQueuePlaceholder: "Seleccione una cola",
         fieldConnectionPlaceholder: "Seleccione una conexión",
@@ -469,6 +469,10 @@ const messages = {
           "Error al obtener el mensaje en WhtasApp, tal vez sea demasiado antiguo.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "Este color ya está en uso, elija otro.",
+        ERR_TRANSFER_QUEUE_REQUIRED:
+          "Seleccione una cola antes de transferir el ticket.",
+        ERR_USER_NOT_IN_QUEUE:
+          "El agente seleccionado no pertenece a la cola de destino.",
         ERR_WAPP_GREETING_REQUIRED:
           "El mensaje de saludo es obligatorio cuando hay más de una cola.",
       },

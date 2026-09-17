@@ -6,6 +6,7 @@ import Whatsapp from "../../models/Whatsapp";
 interface Request {
   searchParam?: string;
   pageNumber?: string | number;
+  queueId?: string | number;
 }
 
 interface Response {
@@ -16,7 +17,8 @@ interface Response {
 
 const ListUsersService = async ({
   searchParam = "",
-  pageNumber = "1"
+  pageNumber = "1",
+  queueId
 }: Request): Promise<Response> => {
   const whereCondition = {
     [Op.or]: [
@@ -32,6 +34,16 @@ const ListUsersService = async ({
   };
   const limit = 20;
   const offset = limit * (+pageNumber - 1);
+  const queueInclude: any = {
+    model: Queue,
+    as: "queues",
+    attributes: ["id", "name", "color"]
+  };
+
+  if (queueId) {
+    queueInclude.where = { id: queueId };
+    queueInclude.required = true;
+  }
 
   const { count, rows: users } = await User.findAndCountAll({
     where: whereCondition,
@@ -39,8 +51,9 @@ const ListUsersService = async ({
     limit,
     offset,
     order: [["createdAt", "DESC"]],
+    ...(queueId ? { distinct: true } : {}),
     include: [
-      { model: Queue, as: "queues", attributes: ["id", "name", "color"] },
+      queueInclude,
       { model: Whatsapp, as: "whatsapp", attributes: ["id", "name"] }
     ]
   });

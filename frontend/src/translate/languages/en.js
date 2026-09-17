@@ -247,8 +247,8 @@ const messages = {
       },
       transferTicketModal: {
         title: "Transfer Ticket",
-        fieldLabel: "Type to search for users",
-        fieldQueueLabel: "Transfer to queue",
+        fieldLabel: "Agent (optional)",
+        fieldQueueLabel: "Destination queue",
         fieldConnectionLabel: "Transfer to connection",
         fieldQueuePlaceholder: "Please select a queue",
         fieldConnectionPlaceholder: "Please select a connection",
@@ -462,6 +462,10 @@ const messages = {
           "Error fetching the message in WhtasApp, maybe it is too old.",
         ERR_QUEUE_COLOR_ALREADY_EXISTS:
           "This color is already in use, pick another one.",
+        ERR_TRANSFER_QUEUE_REQUIRED:
+          "Select a queue before transferring the ticket.",
+        ERR_USER_NOT_IN_QUEUE:
+          "The selected agent does not belong to the destination queue.",
         ERR_WAPP_GREETING_REQUIRED:
           "Greeting message is required if there is more than one queue.",
       },

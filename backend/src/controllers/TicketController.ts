@@ -5,6 +5,7 @@ import CreateTicketService from "../services/TicketServices/CreateTicketService"
 import DeleteTicketService from "../services/TicketServices/DeleteTicketService";
 import ListTicketsService from "../services/TicketServices/ListTicketsService";
 import ShowTicketService from "../services/TicketServices/ShowTicketService";
+import TransferTicketService from "../services/TicketServices/TransferTicketService";
 import UpdateTicketService from "../services/TicketServices/UpdateTicketService";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
@@ -25,6 +26,14 @@ interface TicketData {
   status: string;
   queueId: number;
   userId: number;
+}
+
+interface TicketUpdateData {
+  status?: string;
+  queueId?: number;
+  userId?: number | null;
+  whatsappId?: number;
+  operation?: "transfer";
 }
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
@@ -87,12 +96,20 @@ export const update = async (
   res: Response
 ): Promise<Response> => {
   const { ticketId } = req.params;
-  const ticketData: TicketData = req.body;
+  const { operation, ...ticketData } = req.body as TicketUpdateData;
 
-  const { ticket } = await UpdateTicketService({
-    ticketData,
-    ticketId
-  });
+  const { ticket } =
+    operation === "transfer"
+      ? await TransferTicketService({
+          ticketId,
+          queueId: ticketData.queueId,
+          userId: ticketData.userId,
+          whatsappId: ticketData.whatsappId
+        })
+      : await UpdateTicketService({
+          ticketData,
+          ticketId
+        });
 
   if (ticket.status === "closed") {
     const whatsapp = await ShowWhatsAppService(ticket.whatsappId);

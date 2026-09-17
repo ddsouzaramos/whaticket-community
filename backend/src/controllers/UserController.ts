@@ -13,14 +13,16 @@ import DeleteUserService from "../services/UserServices/DeleteUserService";
 type IndexQuery = {
   searchParam: string;
   pageNumber: string;
+  queueId: string;
 };
 
 export const index = async (req: Request, res: Response): Promise<Response> => {
-  const { searchParam, pageNumber } = req.query as IndexQuery;
+  const { searchParam, pageNumber, queueId } = req.query as IndexQuery;
 
   const { users, count, hasMore } = await ListUsersService({
     searchParam,
-    pageNumber
+    pageNumber,
+    queueId
   });
 
   return res.json({ users, count, hasMore });

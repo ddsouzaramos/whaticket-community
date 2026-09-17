@@ -8,7 +8,7 @@ import ShowTicketService from "./ShowTicketService";
 
 interface TicketData {
   status?: string;
-  userId?: number;
+  userId?: number | null;
   queueId?: number;
   whatsappId?: number;
 }
