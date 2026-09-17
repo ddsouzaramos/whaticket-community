@@ -381,6 +381,12 @@ const messages = {
             reopen: "Reopen",
             accept: "Accept",
           },
+          confirmationModal: {
+            title: "Close this service request?",
+            message:
+              "This service request will be closed. If the contact sends a new message, a new service request will be created and routed back to the entry queue.",
+            confirm: "Close service request",
+          },
         },
       },
       messagesInput: {

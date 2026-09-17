@@ -255,7 +255,8 @@ export const handleMessage = async (
       contact,
       contextPayload.whatsappId,
       contextPayload.unreadMessages,
-      groupContact
+      groupContact,
+      processedMessage.fromMe
     );
 
     const messageData: any = {

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 import { useHistory } from "react-router-dom";
 
 import { makeStyles } from "@material-ui/core/styles";
@@ -9,6 +9,7 @@ import { i18n } from "../../translate/i18n";
 import api from "../../services/api";
 import TicketOptionsMenu from "../TicketOptionsMenu";
 import ButtonWithSpinner from "../ButtonWithSpinner";
+import ConfirmationModal from "../ConfirmationModal";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
 
@@ -29,6 +30,8 @@ const TicketActionButtons = ({ ticket }) => {
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [resolveConfirmationOpen, setResolveConfirmationOpen] = useState(false);
+	const updatingTicketRef = useRef(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 
@@ -41,6 +44,9 @@ const TicketActionButtons = ({ ticket }) => {
 	};
 
 	const handleUpdateTicketStatus = async (e, status, userId) => {
+		if (updatingTicketRef.current) return;
+
+		updatingTicketRef.current = true;
 		setLoading(true);
 		try {
 			await api.put(`/tickets/${ticket.id}`, {
@@ -48,15 +54,16 @@ const TicketActionButtons = ({ ticket }) => {
 				userId: userId || null,
 			});
 
-			setLoading(false);
 			if (status === "open") {
 				history.push(`/tickets/${ticket.id}`);
 			} else {
 				history.push("/tickets");
 			}
 		} catch (err) {
-			setLoading(false);
 			toastError(err);
+		} finally {
+			updatingTicketRef.current = false;
+			setLoading(false);
 		}
 	};
 
@@ -87,7 +94,7 @@ const TicketActionButtons = ({ ticket }) => {
 						size="small"
 						variant="contained"
 						color="primary"
-						onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)}
+						onClick={() => setResolveConfirmationOpen(true)}
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
@@ -113,6 +120,19 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>
 			)}
+			<ConfirmationModal
+				title={i18n.t("messagesList.header.confirmationModal.title")}
+				open={resolveConfirmationOpen}
+				onClose={setResolveConfirmationOpen}
+				onConfirm={() =>
+					handleUpdateTicketStatus(null, "closed", user?.id)
+				}
+				confirmButtonText={i18n.t(
+					"messagesList.header.confirmationModal.confirm"
+				)}
+			>
+				{i18n.t("messagesList.header.confirmationModal.message")}
+			</ConfirmationModal>
 		</div>
 	);
 };

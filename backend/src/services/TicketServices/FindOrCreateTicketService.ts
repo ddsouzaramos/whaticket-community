@@ -8,7 +8,8 @@ const FindOrCreateTicketService = async (
   contact: Contact,
   whatsappId: number,
   unreadMessages: number,
-  groupContact?: Contact
+  groupContact?: Contact,
+  reopenRecentTicket = true
 ): Promise<Ticket> => {
   let ticket = await Ticket.findOne({
     where: {
@@ -42,7 +43,7 @@ const FindOrCreateTicketService = async (
     }
   }
 
-  if (!ticket && !groupContact) {
+  if (!ticket && !groupContact && reopenRecentTicket) {
     ticket = await Ticket.findOne({
       where: {
         updatedAt: {

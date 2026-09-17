@@ -385,6 +385,12 @@ const messages = {
             reopen: "Reabrir",
             accept: "Aceitar",
           },
+          confirmationModal: {
+            title: "Finalizar atendimento?",
+            message:
+              "Este atendimento será encerrado. Se o contato enviar uma nova mensagem, será iniciado um novo atendimento e ele será encaminhado novamente para a fila de entrada.",
+            confirm: "Finalizar atendimento",
+          },
         },
       },
       messagesInput: {
