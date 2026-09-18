@@ -21,6 +21,7 @@ ENV CHROME_BIN=/usr/bin/chromium
 WORKDIR /usr/src/app
 
 COPY package*.json ./
+COPY patches ./patches
 
 RUN npm install
 

@@ -8,6 +8,7 @@
     "watch": "tsc -w",
     "start": "nodemon dist/server.js",
     "dev": "ts-node-dev --respawn --transpile-only --ignore node_modules src/server.ts",
+    "postinstall": "patch-package --error-on-fail",
     "pretest": "NODE_ENV=test sequelize db:migrate && NODE_ENV=test sequelize db:seed:all",
     "test": "NODE_ENV=test jest",
     "posttest": "NODE_ENV=test sequelize db:migrate:undo:all",
@@ -50,7 +51,7 @@
     "socket.io": "^3.0.5",
     "uuid": "^8.3.2",
     "whaileys": "^6.4.3",
-    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#main",
+    "whatsapp-web.js": "github:pedroslopez/whatsapp-web.js#942d236a11ad68807308b058303ba5256915979c",
     "yup": "^0.32.8"
   },
   "devDependencies": {
@@ -84,6 +85,7 @@
     "faker": "^5.1.0",
     "jest": "^26.6.0",
     "nodemon": "^2.0.4",
+    "patch-package": "8.0.0",
     "prettier": "^2.1.2",
     "supertest": "^5.0.0",
     "ts-jest": "^26.4.1",
