@@ -20,4 +20,10 @@ messageRoutes.post(
 
 messageRoutes.delete("/messages/:messageId", isAuth, MessageController.remove);
 
+messageRoutes.post(
+  "/messages/:messageId/forward",
+  isAuth,
+  MessageController.forward
+);
+
 export default messageRoutes;

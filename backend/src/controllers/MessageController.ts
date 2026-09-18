@@ -9,6 +9,7 @@ import ShowTicketService from "../services/TicketServices/ShowTicketService";
 import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessage";
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
+import ForwardWhatsAppMessageService from "../services/MessageServices/ForwardWhatsAppMessageService";
 
 type IndexQuery = {
   pageNumber: string;
@@ -72,4 +73,22 @@ export const remove = async (
   });
 
   return res.send();
+};
+
+export const forward = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.params;
+  const { destinationTicketId } = req.body as {
+    destinationTicketId: number;
+  };
+
+  await ForwardWhatsAppMessageService({
+    messageId,
+    destinationTicketId,
+    userId: req.user.id
+  });
+
+  return res.status(204).send();
 };

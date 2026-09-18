@@ -33,6 +33,7 @@ import {
   buildWwebjsMediaPayload,
   extractWwebjsMessageMetadata
 } from "./wwebjsMessageMetadata";
+import ForwardWwebjsMessage from "./wwebjsForwardMessage";
 
 interface Session extends Client {
   id?: number;
@@ -510,6 +511,20 @@ const fetchChatMessages = async (
   return messages.map(convertToProviderMessage);
 };
 
+const forwardMessage = async (
+  sessionId: number,
+  providerMessageId: string,
+  destinationProviderChatId: string
+): Promise<void> => {
+  const wbot = getWbot(sessionId);
+
+  await ForwardWwebjsMessage(
+    wbot,
+    providerMessageId,
+    destinationProviderChatId
+  );
+};
+
 const getContacts = async (sessionId: number): Promise<ProviderContact[]> => {
   const wbot = getWbot(sessionId);
   const contacts = await wbot.getContacts();
@@ -735,5 +750,6 @@ export const WhatsappWebJsProvider: WhatsappProvider = {
   getProfilePicUrl,
   getContacts,
   sendSeen,
-  fetchChatMessages
+  fetchChatMessages,
+  forwardMessage
 };

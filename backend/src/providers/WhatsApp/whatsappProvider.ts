@@ -40,6 +40,11 @@ export interface WhatsappProvider {
     chatId: string,
     limit: number
   ): Promise<ProviderMessage[]>;
+  forwardMessage?(
+    sessionId: number,
+    providerMessageId: string,
+    destinationProviderChatId: string
+  ): Promise<void>;
 }
 
 const provider = process.env.WHATSAPP_PROVIDER || "wwebjs";
