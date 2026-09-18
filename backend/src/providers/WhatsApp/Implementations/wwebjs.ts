@@ -176,8 +176,46 @@ const convertToMediaPayload = async (
 ): Promise<MediaPayload | undefined> => {
   if (!msg.hasMedia) return undefined;
 
-  const media = await msg.downloadMedia();
+  const idSerializedPresent = Boolean(msg.id?._serialized);
+  const idDollar1Present = Boolean((msg.id as any)?.$1);
+
+  logger.info({
+    stage: "media_download_start",
+    type: msg.type,
+    hasMedia: msg.hasMedia,
+    fromMe: msg.fromMe,
+    idSerializedPresent,
+    idDollar1Present,
+    idRemotePresent: Boolean(msg.id?.remote),
+    idIdPresent: Boolean(msg.id?.id)
+  });
+
+  let media;
+  try {
+    media = await msg.downloadMedia();
+  } catch (err) {
+    logger.error({
+      stage: "media_download_error",
+      type: msg.type,
+      hasMedia: msg.hasMedia,
+      fromMe: msg.fromMe,
+      idSerializedPresent,
+      idDollar1Present,
+      errorName: err instanceof Error ? err.name : "UnknownError",
+      errorMessage: err instanceof Error ? err.message : String(err),
+      errorStack: err instanceof Error ? err.stack : undefined
+    });
+
+    throw err;
+  }
+
   if (!media) return undefined;
+
+  logger.info({
+    stage: "media_download_success",
+    type: msg.type,
+    mimetype: media.mimetype
+  });
 
   return {
     filename: media.filename || "",
