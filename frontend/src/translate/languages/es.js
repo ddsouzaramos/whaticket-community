@@ -430,12 +430,41 @@ const messages = {
       messageOptionsMenu: {
         delete: "Borrar",
         reply: "Responder",
+        forward: "Reenviar",
         confirmationModal: {
           title: "¿Borrar mensaje?",
           message: "Esta acción no puede ser revertida.",
         },
       },
+      forwardMessageModal: {
+        title: "Reenviar mensaje",
+        searchPlaceholder: "Buscar ticket o contacto...",
+        noTargets: "No se encontraron tickets.",
+        loadError: "No fue posible cargar los tickets.",
+        noQueue: "Sin cola",
+        success: "Mensaje reenviado correctamente.",
+        status: {
+          pending: "En espera",
+          open: "En atención",
+          closed: "Resuelto",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          forward: "Reenviar",
+        },
+      },
       backendErrors: {
+        ERR_FORWARD_ORIGINAL_MESSAGE_UNAVAILABLE:
+          "El mensaje original ya no está disponible para reenviar.",
+        ERR_FORWARD_DIFFERENT_WHATSAPP_CONNECTIONS:
+          "El ticket de destino utiliza otra conexión de WhatsApp.",
+        ERR_FORWARD_WHATSAPP_NOT_READY:
+          "La conexión de WhatsApp no está lista.",
+        ERR_FORWARD_SOURCE_TICKET_FORBIDDEN:
+          "No tiene acceso al ticket de origen.",
+        ERR_FORWARD_DESTINATION_TICKET_FORBIDDEN:
+          "No tiene acceso al ticket seleccionado.",
+        ERR_FORWARD_PROVIDER_FAILURE: "No fue posible reenviar el mensaje.",
         ERR_NO_OTHER_WHATSAPP:
           "Debe haber al menos una conexión de WhatsApp predeterminada.",
         ERR_NO_DEF_WAPP_FOUND:

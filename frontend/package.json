@@ -33,7 +33,8 @@
     "dev": "vite",
     "start": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:unit": "node ../backend/node_modules/jest/bin/jest.js --config jest.config.js"
   },
   "browserslist": {
     "production": [

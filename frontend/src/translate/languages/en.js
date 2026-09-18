@@ -423,12 +423,41 @@ const messages = {
       messageOptionsMenu: {
         delete: "Delete",
         reply: "Reply",
+        forward: "Forward",
         confirmationModal: {
           title: "Delete message?",
           message: "This action cannot be reverted.",
         },
       },
+      forwardMessageModal: {
+        title: "Forward message",
+        searchPlaceholder: "Search ticket or contact...",
+        noTargets: "No tickets found.",
+        loadError: "Could not load tickets.",
+        noQueue: "No queue",
+        success: "Message forwarded successfully.",
+        status: {
+          pending: "Waiting",
+          open: "In service",
+          closed: "Resolved",
+        },
+        buttons: {
+          cancel: "Cancel",
+          forward: "Forward",
+        },
+      },
       backendErrors: {
+        ERR_FORWARD_ORIGINAL_MESSAGE_UNAVAILABLE:
+          "The original message is no longer available for forwarding.",
+        ERR_FORWARD_DIFFERENT_WHATSAPP_CONNECTIONS:
+          "The destination ticket uses another WhatsApp connection.",
+        ERR_FORWARD_WHATSAPP_NOT_READY:
+          "The WhatsApp connection is not ready.",
+        ERR_FORWARD_SOURCE_TICKET_FORBIDDEN:
+          "You do not have access to the source ticket.",
+        ERR_FORWARD_DESTINATION_TICKET_FORBIDDEN:
+          "You do not have access to the selected ticket.",
+        ERR_FORWARD_PROVIDER_FAILURE: "Could not forward the message.",
         ERR_NO_OTHER_WHATSAPP:
           "There must be at lest one default WhatsApp connection.",
         ERR_NO_DEF_WAPP_FOUND:

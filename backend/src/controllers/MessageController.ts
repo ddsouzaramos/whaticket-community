@@ -10,6 +10,7 @@ import DeleteWhatsAppMessage from "../services/WbotServices/DeleteWhatsAppMessag
 import SendWhatsAppMedia from "../services/WbotServices/SendWhatsAppMedia";
 import SendWhatsAppMessage from "../services/WbotServices/SendWhatsAppMessage";
 import ForwardWhatsAppMessageService from "../services/MessageServices/ForwardWhatsAppMessageService";
+import ListForwardMessageTargetsService from "../services/MessageServices/ListForwardMessageTargetsService";
 
 type IndexQuery = {
   pageNumber: string;
@@ -91,4 +92,24 @@ export const forward = async (
   });
 
   return res.status(204).send();
+};
+
+export const forwardTargets = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { messageId } = req.params;
+  const { searchParam, pageNumber } = req.query as {
+    searchParam?: string;
+    pageNumber?: string;
+  };
+
+  const result = await ListForwardMessageTargetsService({
+    messageId,
+    userId: req.user.id,
+    searchParam,
+    pageNumber
+  });
+
+  return res.status(200).json(result);
 };

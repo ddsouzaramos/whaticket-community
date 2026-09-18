@@ -1,38 +1,19 @@
 import AppError from "../../errors/AppError";
 import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
-import User from "../../models/User";
-import UserQueue from "../../models/UserQueue";
 import Whatsapp from "../../models/Whatsapp";
 import { whatsappProvider } from "../../providers/WhatsApp";
 import { logger } from "../../utils/logger";
+import {
+  CanAccessForwardTicket,
+  GetForwardMessageAccessContext
+} from "./ForwardMessageAccessPolicy";
 
 interface Request {
   messageId: string;
   destinationTicketId: number;
   userId: number | string;
 }
-
-const canAccessTicket = (
-  ticket: Ticket,
-  userId: number,
-  isAdmin: boolean,
-  userQueueIds: Set<number>
-): boolean => {
-  if (isAdmin) return true;
-
-  const hasQueueAccess =
-    ticket.queueId !== null &&
-    ticket.queueId !== undefined &&
-    userQueueIds.has(Number(ticket.queueId));
-  const hasAssignmentAccess =
-    (ticket.userId !== null &&
-      ticket.userId !== undefined &&
-      Number(ticket.userId) === userId) ||
-    ticket.status === "pending";
-
-  return hasQueueAccess && hasAssignmentAccess;
-};
 
 const ForwardWhatsAppMessageService = async ({
   messageId,
@@ -57,32 +38,13 @@ const ForwardWhatsAppMessageService = async ({
     throw new AppError("ERR_FORWARD_SOURCE_TICKET_NOT_FOUND", 404);
   }
 
-  const authenticatedUserId = Number(userId);
-  const user = await User.findByPk(authenticatedUserId, {
-    attributes: ["id", "profile"]
-  });
+  const access = await GetForwardMessageAccessContext(userId);
 
-  if (!user) {
+  if (!access) {
     throw new AppError("ERR_FORWARD_SOURCE_TICKET_FORBIDDEN", 403);
   }
 
-  const isAdmin = user.profile === "admin";
-  const userQueues = isAdmin
-    ? []
-    : await UserQueue.findAll({
-        where: { userId: authenticatedUserId },
-        attributes: ["queueId"]
-      });
-  const userQueueIds = new Set(userQueues.map(item => Number(item.queueId)));
-
-  if (
-    !canAccessTicket(
-      sourceTicket,
-      authenticatedUserId,
-      isAdmin,
-      userQueueIds
-    )
-  ) {
+  if (!CanAccessForwardTicket(sourceTicket, access)) {
     throw new AppError("ERR_FORWARD_SOURCE_TICKET_FORBIDDEN", 403);
   }
 
@@ -94,14 +56,7 @@ const ForwardWhatsAppMessageService = async ({
     throw new AppError("ERR_FORWARD_DESTINATION_TICKET_NOT_FOUND", 404);
   }
 
-  if (
-    !canAccessTicket(
-      destinationTicket,
-      authenticatedUserId,
-      isAdmin,
-      userQueueIds
-    )
-  ) {
+  if (!CanAccessForwardTicket(destinationTicket, access)) {
     throw new AppError("ERR_FORWARD_DESTINATION_TICKET_FORBIDDEN", 403);
   }
 

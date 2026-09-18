@@ -428,12 +428,42 @@ const messages = {
       messageOptionsMenu: {
         delete: "Deletar",
         reply: "Responder",
+        forward: "Encaminhar",
         confirmationModal: {
           title: "Apagar mensagem?",
           message: "Esta ação não pode ser revertida.",
         },
       },
+      forwardMessageModal: {
+        title: "Encaminhar mensagem",
+        searchPlaceholder: "Buscar atendimento ou contato...",
+        noTargets: "Nenhum atendimento encontrado.",
+        loadError: "Não foi possível carregar os atendimentos.",
+        noQueue: "Sem fila",
+        success: "Mensagem encaminhada com sucesso.",
+        status: {
+          pending: "Aguardando",
+          open: "Em atendimento",
+          closed: "Resolvido",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          forward: "Encaminhar",
+        },
+      },
       backendErrors: {
+        ERR_FORWARD_ORIGINAL_MESSAGE_UNAVAILABLE:
+          "A mensagem original não está mais disponível para encaminhamento.",
+        ERR_FORWARD_DIFFERENT_WHATSAPP_CONNECTIONS:
+          "O atendimento de destino utiliza outra conexão do WhatsApp.",
+        ERR_FORWARD_WHATSAPP_NOT_READY:
+          "A conexão do WhatsApp não está pronta.",
+        ERR_FORWARD_SOURCE_TICKET_FORBIDDEN:
+          "Você não possui acesso ao atendimento de origem.",
+        ERR_FORWARD_DESTINATION_TICKET_FORBIDDEN:
+          "Você não possui acesso ao atendimento selecionado.",
+        ERR_FORWARD_PROVIDER_FAILURE:
+          "Não foi possível encaminhar a mensagem.",
         ERR_NO_OTHER_WHATSAPP: "Deve haver pelo menos um WhatsApp padrão.",
         ERR_NO_DEF_WAPP_FOUND:
           "Nenhum WhatsApp padrão encontrado. Verifique a página de conexões.",
