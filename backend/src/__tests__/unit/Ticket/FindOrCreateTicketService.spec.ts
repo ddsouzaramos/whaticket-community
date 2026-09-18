@@ -52,6 +52,78 @@ describe("FindOrCreateTicketService", () => {
     }
   );
 
+  it.each([
+    "5511999999999@lid",
+    "5511999999999@c.us",
+    "120363000000000000@g.us"
+  ])("preserves providerChatId exactly for %s", async providerChatId => {
+    const activeTicket = {
+      id: 20,
+      update: jest.fn()
+    };
+    mockedTicket.findOne.mockResolvedValueOnce(activeTicket);
+    mockedShowTicketService.mockResolvedValueOnce(
+      activeTicket as unknown as Ticket
+    );
+
+    await FindOrCreateTicketService(
+      contact,
+      1,
+      2,
+      undefined,
+      true,
+      providerChatId
+    );
+
+    expect(activeTicket.update).toHaveBeenCalledWith({
+      unreadMessages: 2,
+      providerChatId
+    });
+  });
+
+  it("does not overwrite providerChatId when a new value is absent", async () => {
+    const activeTicket = {
+      id: 20,
+      providerChatId: "5511999999999@lid",
+      update: jest.fn()
+    };
+    mockedTicket.findOne.mockResolvedValueOnce(activeTicket);
+    mockedShowTicketService.mockResolvedValueOnce(
+      activeTicket as unknown as Ticket
+    );
+
+    await FindOrCreateTicketService(contact, 1, 2);
+
+    expect(activeTicket.update).toHaveBeenCalledWith({ unreadMessages: 2 });
+  });
+
+  it("persists providerChatId when creating a ticket", async () => {
+    const newTicket = { id: 24 };
+    mockedTicket.findOne.mockResolvedValueOnce(null);
+    mockedTicket.create.mockResolvedValueOnce(newTicket);
+    mockedShowTicketService.mockResolvedValueOnce(
+      newTicket as unknown as Ticket
+    );
+
+    await FindOrCreateTicketService(
+      contact,
+      1,
+      1,
+      undefined,
+      false,
+      "5511999999999@lid"
+    );
+
+    expect(mockedTicket.create).toHaveBeenCalledWith({
+      contactId: contact.id,
+      status: "pending",
+      isGroup: false,
+      unreadMessages: 1,
+      whatsappId: 1,
+      providerChatId: "5511999999999@lid"
+    });
+  });
+
   it("creates a new ticket instead of reopening a closed ticket for an incoming message", async () => {
     const newTicket = { id: 21 };
     const resolvedTicket = {

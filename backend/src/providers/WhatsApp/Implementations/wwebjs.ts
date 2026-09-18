@@ -29,6 +29,10 @@ import {
   MediaPayload,
   WhatsappContextPayload
 } from "../../../handlers/handleWhatsappEvents";
+import {
+  buildWwebjsMediaPayload,
+  extractWwebjsMessageMetadata
+} from "./wwebjsMessageMetadata";
 
 interface Session extends Client {
   id?: number;
@@ -76,6 +80,7 @@ const convertToProviderMessage = (
 ): ProviderMessage => {
   return {
     id: wbotMessage.id.id,
+    ...extractWwebjsMessageMetadata(wbotMessage),
     body: wbotMessage.body,
     fromMe: wbotMessage.fromMe,
     hasMedia: wbotMessage.hasMedia,
@@ -159,6 +164,7 @@ const convertToMessagePayload = async (
 
   return {
     id: processedMsg.id.id,
+    ...extractWwebjsMessageMetadata(processedMsg),
     body: processedMsg.body,
     fromMe: processedMsg.fromMe,
     hasMedia: processedMsg.hasMedia,
@@ -217,11 +223,7 @@ const convertToMediaPayload = async (
     mimetype: media.mimetype
   });
 
-  return {
-    filename: media.filename || "",
-    mimetype: media.mimetype,
-    data: media.data
-  };
+  return buildWwebjsMediaPayload(media);
 };
 
 const shouldHandleMessage = (msg: WbotMessage): boolean => {

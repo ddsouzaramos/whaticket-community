@@ -13,6 +13,10 @@ export type MessageAck = 0 | 1 | 2 | 3 | 4; // PENDING, SERVER, DEVICE, READ, PL
 
 export interface ProviderMessage {
   id: string;
+  providerMessageId?: string;
+  remoteJid?: string;
+  providerType?: string;
+  caption?: string;
   body: string;
   fromMe: boolean;
   hasMedia: boolean;

@@ -3,7 +3,7 @@ import Message from "../../models/Message";
 import Ticket from "../../models/Ticket";
 import Whatsapp from "../../models/Whatsapp";
 
-interface MessageData {
+export interface MessageData {
   id: string;
   ticketId: number;
   body: string;
@@ -12,6 +12,12 @@ interface MessageData {
   read?: boolean;
   mediaType?: string;
   mediaUrl?: string;
+  providerMessageId?: string;
+  remoteJid?: string;
+  providerType?: string;
+  mediaMimeType?: string;
+  mediaFilename?: string;
+  caption?: string;
   ack?: number;
   quotedMsgId?: string;
 }

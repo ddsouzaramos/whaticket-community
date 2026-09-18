@@ -9,7 +9,9 @@ import {
   BelongsTo,
   HasMany,
   AutoIncrement,
-  Default
+  Default,
+  DefaultScope,
+  DataType
 } from "sequelize-typescript";
 
 import Contact from "./Contact";
@@ -18,6 +20,9 @@ import Queue from "./Queue";
 import User from "./User";
 import Whatsapp from "./Whatsapp";
 
+@DefaultScope(() => ({
+  attributes: { exclude: ["providerChatId"] }
+}))
 @Table
 class Ticket extends Model<Ticket> {
   @PrimaryKey
@@ -37,6 +42,9 @@ class Ticket extends Model<Ticket> {
   @Default(false)
   @Column
   isGroup: boolean;
+
+  @Column(DataType.STRING)
+  providerChatId: string | null;
 
   @CreatedAt
   createdAt: Date;

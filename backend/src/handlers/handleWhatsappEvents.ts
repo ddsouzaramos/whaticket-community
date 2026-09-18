@@ -13,6 +13,7 @@ import Ticket from "../models/Ticket";
 import Message from "../models/Message";
 
 import CreateMessageService from "../services/MessageServices/CreateMessageService";
+import BuildMessageData from "../services/MessageServices/BuildMessageData";
 import CreateOrUpdateContactService from "../services/ContactServices/CreateOrUpdateContactService";
 import FindOrCreateTicketService from "../services/TicketServices/FindOrCreateTicketService";
 import ShowWhatsAppService from "../services/WhatsappService/ShowWhatsAppService";
@@ -45,6 +46,10 @@ export interface MessagePayload {
   quotedMsgId?: string;
   mediaUrl?: string;
   mediaType?: string;
+  providerMessageId?: string;
+  remoteJid?: string;
+  providerType?: string;
+  caption?: string;
   ack?: MessageAck;
 }
 
@@ -256,28 +261,23 @@ export const handleMessage = async (
       contextPayload.whatsappId,
       contextPayload.unreadMessages,
       groupContact,
-      processedMessage.fromMe
+      processedMessage.fromMe,
+      processedMessage.remoteJid
     );
 
-    const messageData: any = {
-      id: processedMessage.id,
-      ticketId: ticket.id,
-      contactId: processedMessage.fromMe ? undefined : contact.id,
-      body: processedMessage.body,
-      fromMe: processedMessage.fromMe,
-      read: processedMessage.fromMe,
-      mediaType: processedMessage.type,
-      quotedMsgId: processedMessage.quotedMsgId,
-      ack: processedMessage.ack !== undefined ? processedMessage.ack : 0
-    };
+    let storedMediaFilename: string | undefined;
 
     if (mediaPayload && processedMessage.hasMedia) {
-      const filename = await saveMediaFile(mediaPayload);
-      messageData.mediaUrl = filename;
-      messageData.body = processedMessage.body || filename;
-      const [mediaType] = mediaPayload.mimetype.split("/");
-      messageData.mediaType = mediaType;
+      storedMediaFilename = await saveMediaFile(mediaPayload);
     }
+
+    const messageData = BuildMessageData({
+      messagePayload: processedMessage,
+      ticketId: ticket.id,
+      contactId: processedMessage.fromMe ? undefined : contact.id,
+      mediaPayload,
+      storedMediaFilename
+    });
 
     let lastMessageText = "";
     if (processedMessage.type === "location") {

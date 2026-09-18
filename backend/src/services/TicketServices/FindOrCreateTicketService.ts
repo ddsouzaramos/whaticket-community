@@ -9,8 +9,11 @@ const FindOrCreateTicketService = async (
   whatsappId: number,
   unreadMessages: number,
   groupContact?: Contact,
-  reopenRecentTicket = true
+  reopenRecentTicket = true,
+  providerChatId?: string
 ): Promise<Ticket> => {
+  const providerChatData = providerChatId ? { providerChatId } : {};
+
   let ticket = await Ticket.findOne({
     where: {
       status: {
@@ -22,7 +25,7 @@ const FindOrCreateTicketService = async (
   });
 
   if (ticket) {
-    await ticket.update({ unreadMessages });
+    await ticket.update({ unreadMessages, ...providerChatData });
   }
 
   if (!ticket && groupContact) {
@@ -38,7 +41,8 @@ const FindOrCreateTicketService = async (
       await ticket.update({
         status: "pending",
         userId: null,
-        unreadMessages
+        unreadMessages,
+        ...providerChatData
       });
     }
   }
@@ -59,7 +63,8 @@ const FindOrCreateTicketService = async (
       await ticket.update({
         status: "pending",
         userId: null,
-        unreadMessages
+        unreadMessages,
+        ...providerChatData
       });
     }
   }
@@ -70,7 +75,8 @@ const FindOrCreateTicketService = async (
       status: "pending",
       isGroup: !!groupContact,
       unreadMessages,
-      whatsappId
+      whatsappId,
+      ...providerChatData
     });
   }
 

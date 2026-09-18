@@ -7,12 +7,25 @@ import {
   DataType,
   PrimaryKey,
   Default,
+  DefaultScope,
   BelongsTo,
   ForeignKey
 } from "sequelize-typescript";
 import Contact from "./Contact";
 import Ticket from "./Ticket";
 
+@DefaultScope(() => ({
+  attributes: {
+    exclude: [
+      "providerMessageId",
+      "remoteJid",
+      "providerType",
+      "mediaMimeType",
+      "mediaFilename",
+      "caption"
+    ]
+  }
+}))
 @Table
 class Message extends Model<Message> {
   @PrimaryKey
@@ -46,6 +59,24 @@ class Message extends Model<Message> {
 
   @Column
   mediaType: string;
+
+  @Column(DataType.STRING(512))
+  providerMessageId: string | null;
+
+  @Column(DataType.STRING)
+  remoteJid: string | null;
+
+  @Column(DataType.STRING)
+  providerType: string | null;
+
+  @Column(DataType.STRING)
+  mediaMimeType: string | null;
+
+  @Column(DataType.STRING(512))
+  mediaFilename: string | null;
+
+  @Column(DataType.TEXT)
+  caption: string | null;
 
   @Default(false)
   @Column
